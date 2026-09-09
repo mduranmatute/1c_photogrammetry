@@ -1,11 +1,12 @@
 Base_Loc= '..\Examples\Data_Files\MATLAB\Calibration_data\';
 SaveB_Loc='..\Examples\Data_Files\NETCDF\Calibration_Data\';
 
-list = ls([Base_Loc '*.mat']);
-[nz,~] = size(list);
+files = dir([Base_Loc '*.mat']);
+names = sort({files.name});
+nz = numel(names);
 
 for iz = 1:nz
-    Filename = [Base_Loc, list(iz,:)];
+    Filename = [Base_Loc, names{iz}];
     CalibData = load(Filename);
 
     % Linear model Poly33:
@@ -49,7 +50,7 @@ for iz = 1:nz
         NL = 1:N_dim;
 
 %===================================================== Name and create file
-        Name_sep = regexp(list(iz,:), '\.', 'split');
+        Name_sep = regexp(names{iz}, '\.', 'split');
         NCF_name = [Name_sep{1} '.nc'];
         ncid = netcdf.create([SaveB_Loc NCF_name],'NC_WRITE');
         

@@ -16,7 +16,8 @@ Lens_pass = 0; % Force the use of an additional plane in the calibration.
                % This is not usually recommended.
 
 %% Data and function root directories
-addpath('Common_Functions\'); % Folder containing the functions used
+addpath(fullfile(fileparts(mfilename('fullpath')), 'Common_Functions'));
+                                    % Folder containing the functions used
                                     % in the script.
 SavLoc = ''; % Root location where data is saved. 
 ImageDir = ''; % Location of the photographs used for the calibration.
@@ -112,10 +113,11 @@ if create_new
         % Add all the folders in the directory with z_1, z_2, ... z_n
         % in a list.
         imgfold = sprintf('z_%d/', iz);
-        list = ls([ImageDir imgfold, '*.png']);
+        files = dir([ImageDir imgfold, '*.png']);
+        names = sort({files.name});
         for ii = 1:npos % for all photographed patterns
             %figure
-            imgname = [ImageDir imgfold, list(ii,:)];
+            imgname = fullfile(ImageDir, imgfold, names{ii});
             im = imread(imgname);
             im = im2bw(im,.3); % Threshold the brightness of the image. 
                                % helps in the detection.
@@ -161,11 +163,11 @@ if create_new
             % Pattern captured by the camera.
             Icam{ii} = imread(image_names{iz,ii});
         end
-        % The comparisson is done by the function 
-        % [sort_projector_calibration_data]. It requires user input to 
-        % relate the projected dots to the ones captured by the camera. 
+        % The comparisson is done by the function
+        % [sort_projected_dots]. It requires user input to
+        % relate the projected dots to the ones captured by the camera.
         % Graphical interface is required for the input.
-        image_dots(iz,:) = sort_projector_calibration_data(Ipat, Icam, ...
+        image_dots(iz,:) = sort_projected_dots(Ipat, Icam, ...
                                                 patdots, camdots(iz,:));
     end
     % Save file

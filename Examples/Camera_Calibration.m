@@ -20,7 +20,8 @@ PlotCheck = 0; % Use to plot some of the results. Used for diagnostics
                %  and to visualize some of the results. 
 
 %% Give function root directories and give (or load) needed data 
-addpath('..\..\Common_Functions\'); % Folder containing the functions used
+addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'Common_Functions'));
+                                    % Folder containing the functions used
                                     % in the script.
 SavLoc = '..\Data_Files\MATLAB'; % Root location where data is saved. 
                
@@ -57,9 +58,10 @@ if exist(infofile, 'file') % Find if file already exists.
 end
 
 if create_new %If file does not exist find dots and create file.
-    list = ls([imagedir 'z*.png']); % make a list with the images.
+    files = dir([imagedir 'z*.png']); % make a list with the images.
+    names = sort({files.name});
     for iz = 1:nz % cycle though each image in the list
-        imgname = [imagedir, list(iz,:)];
+        imgname = fullfile(imagedir, names{iz});
         im = imread(imgname);
         I{iz} = im;
         dotpos(iz) = find_circles(im, [5,12]); %Use function to identify
