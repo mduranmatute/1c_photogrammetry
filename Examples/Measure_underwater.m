@@ -17,7 +17,8 @@
 % measurement files are saved in 
 % (Photogrammetry\Examples\Data_Files\MATLAB\Measurements).
 
-addpath('..\..\Common_Functions\'); % Folder containing the functions used
+addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'Common_Functions'));
+                                    % Folder containing the functions used
                                     % in the script.
 BaseLoc = '..\Data_Files\MATLAB\'; % Base directory to save data
 StepSave = 'Data_process_steps\Measurements\'; % Extension to the directory 
@@ -233,10 +234,11 @@ end
 % Create file containing the positions (x,y) of the dots photographed. 
 if create_new    
     % Make a list of all saved photographed patterns
-    list = ls([imagedir, '*.png']);
-    clear camdots  
+    files = dir([imagedir, '*.png']);
+    names = sort({files.name});
+    clear camdots
     for ii = 1:npos % cycle through each pattern projected
-        imgname = [imagedir, list(ii,:)]; 
+        imgname = fullfile(imagedir, names{ii});
         im = imread(imgname);
         %--------------------------- Display photograph, find dots and plot
         imagesc(im);
@@ -283,11 +285,11 @@ if create_new
         % Pattern captured by the camera.
         Icam{ii} = imread(image_names{ii});
     end
-    % The comparisson is done by the function 
-    % [sort_projector_calibration_data]. It requires user input to 
-    % relate the projected dots to the ones captured by the camera. 
+    % The comparisson is done by the function
+    % [sort_projected_dots]. It requires user input to
+    % relate the projected dots to the ones captured by the camera.
     % Graphical interface is required for the input.
-    image_dots = sort_projector_calibration_data(Ipat, Icam, ...
+    image_dots = sort_projected_dots(Ipat, Icam, ...
                     patdots, camdots);
     
     save(infofile, 'image_dots');

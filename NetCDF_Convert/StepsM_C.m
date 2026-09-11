@@ -1,17 +1,18 @@
 Base_Loc= '..\Examples\Data_Files\MATLAB\Data_process_steps\Measurements\';
 SaveB_Loc='..\Examples\Data_Files\NETCDF\Data_process_steps\Measurements\';
 
-list = ls([Base_Loc '*.mat']);
-[nz,~] = size(list);
+files = dir([Base_Loc '*.mat']);
+names = sort({files.name});
+nz = numel(names);
 
 for iz = 1:nz
 %===================================================== Name and create file
-    Name_sep = regexp(list(iz,:), '\.', 'split');
+    Name_sep = regexp(names{iz}, '\.', 'split');
     NCF_name = [Name_sep{1} '.nc'];
     ncid = netcdf.create([SaveB_Loc NCF_name],'NC_WRITE');
     
     Step_Name = regexp(Name_sep{1}, '\_', 'split');
-    Filename = [Base_Loc, list(iz,:)];
+    Filename = [Base_Loc, names{iz}];
     DataFile = load(Filename); 
     
     if strcmp(Step_Name{1},'DotsInCam')

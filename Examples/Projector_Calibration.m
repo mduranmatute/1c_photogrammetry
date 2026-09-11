@@ -21,7 +21,8 @@ PlotCheck = 0; % Use to plot some of the results. Used for diagnostics
                %  and to visualize some of the results. 
 
 %% Give function root directories and give (or load) needed data 
-addpath('..\..\Common_Functions\'); % Folder containing the functions used
+addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'Common_Functions'));
+                                    % Folder containing the functions used
                                     % in the script.
 SavLoc = '..\Data_Files\MATLAB'; % Root location where data is saved. 
 ImageDir    = 'Photographs\Projector\'; % Location of the photographs used
@@ -129,12 +130,13 @@ if create_new
         % Add all the folders in the directory with z_1, z_2, ... z_n
         % in a list.
         imgfold = sprintf('z_%d/', iz);
-        list = ls([ImageDir imgfold, '*.png']);
+        files = dir([ImageDir imgfold, '*.png']);
+        names = sort({files.name});
         fprintf('processing iz = %d\n', iz);
         for ii = 1:npos % for all photographed patterns
-            imgloc = [ImageDir imgfold, list(ii,:)];
+            imgloc = fullfile(ImageDir, imgfold, names{ii});
             im = imread(imgloc);
-            imgname = [imgfold list(ii,:)];
+            imgname = fullfile(imgfold, names{ii});
             if(PlotCheck) % Show pattern
                 image(im); 
                 % colormap for 8 bit grayvalue images
@@ -194,9 +196,9 @@ if create_new
             % Pattern captured by the camera.
             Icam{ii} = imread([ImageDir image_names{iz,ii}]);
         end
-        % The comparisson is done by the function 
-        % [sort_projector_calibration_data]. It requires user input to 
-        % relate the projected dots to the ones captured by the camera. 
+        % The comparisson is done by the function
+        % [sort_projected_dots]. It requires user input to
+        % relate the projected dots to the ones captured by the camera.
         % Graphical interface is required for the input.
         image_dots(iz,:) = sort_projected_dots(Ipat, Icam, ...
                                                 patdots, camdots(iz,:));

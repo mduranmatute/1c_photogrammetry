@@ -15,7 +15,8 @@ Lens_pass = 0; % Force the use of an additional plane in the calibration.
                % This is not usually recommended.
 
 %% Data and function directories
-addpath('Common_Functions\'); % Folder containing the functions used
+addpath(fullfile(fileparts(mfilename('fullpath')), 'Common_Functions'));
+                                    % Folder containing the functions used
                                     % in the script.
 SavLoc = ''; % Root location where data is saved. 
 imagedir  = ''; % Location of the photographs used for the calibration.
@@ -46,9 +47,10 @@ if exist(infofile, 'file') % Find if file already exists.
 end
 
 if create_new %If file does not exist find dots and create file.
-    list = ls([imagedir 'z*.png']); % make a list with the images.
+    files = dir([imagedir 'z*.png']); % make a list with the images.
+    names = sort({files.name});
     for iz = 1:nz % cycle though each image in the list
-        imgname = [imagedir, list(iz,:)];
+        imgname = fullfile(imagedir, names{iz});
         im = imread(imgname);
         I{iz} = im;
         dotpos(iz) = find_circles(im, [0,0]); %Use function to identify

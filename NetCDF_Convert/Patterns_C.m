@@ -1,11 +1,12 @@
 Base_Loc = '..\Examples\Data_Files\MATLAB\Patterns\';
 SaveB_Loc = '..\Examples\Data_Files\NETCDF\Patterns\';
 
-list = ls([Base_Loc '*.mat']);
-[nz,~] = size(list);
+files = dir([Base_Loc '*.mat']);
+names = sort({files.name});
+nz = numel(names);
 
 for iz = 1:nz
-    Filename = [Base_Loc, list(iz,:)];
+    Filename = [Base_Loc, names{iz}];
     PatternFile = load(Filename);
 
     Pattern = PatternFile.DotsToProject(:,:,:) * 1;
@@ -21,7 +22,7 @@ for iz = 1:nz
 
 %===================================================== Name and create file
         %cd(SaveB_Loc)
-        Name_sep = regexp(list(iz,:), '\.', 'split');
+        Name_sep = regexp(names{iz}, '\.', 'split');
         NCF_name = [Name_sep{1} '.nc'];
         ncid = netcdf.create([SaveB_Loc NCF_name],'NC_WRITE');
         
