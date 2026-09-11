@@ -1,7 +1,9 @@
-Base_Loc= '..\Examples\Data_Files\MATLAB\Data_process_steps\Measurements\';
-SaveB_Loc='..\Examples\Data_Files\NETCDF\Data_process_steps\Measurements\';
+Base_Loc = fullfile('..', 'Examples', 'Data_Files', 'MATLAB', ...
+                     'Data_process_steps', 'Measurements');
+SaveB_Loc = fullfile('..', 'Examples', 'Data_Files', 'NETCDF', ...
+                      'Data_process_steps', 'Measurements');
 
-files = dir([Base_Loc '*.mat']);
+files = dir(fullfile(Base_Loc, '*.mat'));
 names = sort({files.name});
 nz = numel(names);
 
@@ -9,19 +11,21 @@ for iz = 1:nz
 %===================================================== Name and create file
     Name_sep = regexp(names{iz}, '\.', 'split');
     NCF_name = [Name_sep{1} '.nc'];
-    ncid = netcdf.create([SaveB_Loc NCF_name],'NC_WRITE');
-    
+    ncid = netcdf.create(fullfile(SaveB_Loc, NCF_name),'NC_WRITE');
+
     Step_Name = regexp(Name_sep{1}, '\_', 'split');
-    Filename = [Base_Loc, names{iz}];
-    DataFile = load(Filename); 
-    
+    Filename = fullfile(Base_Loc, names{iz});
+    DataFile = load(Filename);
+
     if strcmp(Step_Name{1},'DotsInCam')
         CamDPos = DataFile.camdots;
         ImNames = DataFile.image_names;
-        LocSep = regexp(ImNames{1}, '\\', 'split');
+        % split on either separator: older data may have been produced
+        % with Windows-style backslash paths.
+        LocSep = regexp(ImNames{1}, '[/\\]', 'split');
         LocNm = [];
         for nm = 1:length(LocSep)-1
-            LocNm = [LocNm LocSep{nm} '\'];
+            LocNm = [LocNm LocSep{nm} filesep];
         end
         LnNm = length(LocNm);
         

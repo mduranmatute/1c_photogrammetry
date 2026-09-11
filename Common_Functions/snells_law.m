@@ -1,4 +1,4 @@
-function [pvo,isvalid] = snell(pvi, normal, refr1, refr2)
+function [pvo,isvalid] = snells_law(pvi, normal, refr1, refr2)
     % isvalid it set to true if the refracted ray exist.
     isvalid = false;
     pvo = 0;

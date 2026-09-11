@@ -1,12 +1,14 @@
-Base_Loc = '..\Examples\Data_Files\MATLAB\Measurements\';
-SaveB_Loc = '..\Examples\Data_Files\NETCDF\Measurements\';
+Base_Loc = fullfile('..', 'Examples', 'Data_Files', 'MATLAB', ...
+                     'Measurements');
+SaveB_Loc = fullfile('..', 'Examples', 'Data_Files', 'NETCDF', ...
+                      'Measurements');
 
-files = dir([Base_Loc '*.mat']);
+files = dir(fullfile(Base_Loc, '*.mat'));
 names = sort({files.name});
 nz = numel(names);
 
 for iz = 1:nz
-    Filename = [Base_Loc, names{iz}];
+    Filename = fullfile(Base_Loc, names{iz});
     DataFile = load(Filename);
     
     MesO = DataFile.Pmid;
@@ -20,7 +22,7 @@ for iz = 1:nz
 %===================================================== Name and create file
     Name_sep = regexp(names{iz}, '\.', 'split');
     NCF_name = [Name_sep{1} '.nc'];
-    ncid = netcdf.create([SaveB_Loc NCF_name],'NC_WRITE');
+    ncid = netcdf.create(fullfile(SaveB_Loc, NCF_name),'NC_WRITE');
         
 %======================================================== Define dimensions
     dimidNPnt = netcdf.defDim(ncid,'Num_Points',N_dim);        

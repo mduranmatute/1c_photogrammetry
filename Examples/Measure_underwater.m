@@ -20,10 +20,12 @@
 addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'Common_Functions'));
                                     % Folder containing the functions used
                                     % in the script.
-BaseLoc = '..\Data_Files\MATLAB\'; % Base directory to save data
-StepSave = 'Data_process_steps\Measurements\'; % Extension to the directory 
-                                               % where the data is saved to
-                                               % place each partial step in
+BaseLoc = fullfile('..', 'Data_Files', 'MATLAB'); % Base directory to
+                                                  % save data
+StepSave = fullfile('Data_process_steps', 'Measurements'); % Extension to
+                                               % the directory where the
+                                               % data is saved to place
+                                               % each partial step in
                                                % the data process.
 
 zwater = 216; % Level, or depth, of the water layer (in mm).
@@ -35,9 +37,9 @@ Normal = [0,0,1]; % Define the Normal vector (points upward)
 load('refraction', 'Nwater', 'Nair'); % Load air and water index of 
                                       % refraction values
                                       
-cm = load([BaseLoc 'Calibration_data\Camera_LinesFit_Base'],...
+cm = load(fullfile(BaseLoc, 'Calibration_data', 'Camera_LinesFit_Base'),...
              'cx0', 'cy0', 'cdx', 'cdy');
-pr = load([BaseLoc 'Calibration_data\Projector_LinesFit_Base'],...
+pr = load(fullfile(BaseLoc, 'Calibration_data', 'Projector_LinesFit_Base'),...
              'cx0', 'cy0', 'cdx', 'cdy');
 %% !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 %=================================================================== Cases:
@@ -48,12 +50,14 @@ switch measurement
 %=========================================================================%
     case 1 %--------------------------------------------- "Base resolution"
         % Directory where pattern photographs are located
-        imagedir    = 'Case_Photos\Undulated_Plate\Low_Resolution\';
+        imagedir    = fullfile('Case_Photos', 'Undulated_Plate', ...
+                                'Low_Resolution');
         % Name of files where part of the image processing steps are saved
         camdotsfile = 'DotsInCam_Undulated_BaseR.mat';
         sortedfile  = 'SortedDots_Undulated_BaseR.mat';
         % Name of file where the result (reconstruction) is saved
-        Reconstruct = 'Measurements\Reconstruct_Undulated_BaseRes.mat';
+        Reconstruct = fullfile('Measurements', ...
+                                'Reconstruct_Undulated_BaseRes.mat');
         % Pattern used for measurements
         Pattern_Fl  = 'Pattern_Base.mat';
         
@@ -66,26 +70,30 @@ switch measurement
         Interp_Div = 200; %Used for grid interpolation.
                      
     case 2 %--------------------------------------------- "High Resolution"
-        imagedir    = 'Case_Photos\Undulated_Plate\High_Resolution\';
+        imagedir    = fullfile('Case_Photos', 'Undulated_Plate', ...
+                                'High_Resolution');
         camdotsfile = 'DotsInCam_Undulated_HighR.mat';
         sortedfile  = 'SortedDots_Undulated_HighR.mat';
-        Reconstruct = 'Measurements\Reconstruct_Undulated_HighRes.mat';
+        Reconstruct = fullfile('Measurements', ...
+                                'Reconstruct_Undulated_HighRes.mat');
         Pattern_Fl  = 'Pattern_High.mat';
         thrsh = 50;
         Rrange = [5,10];
         DotR = [3 14];
         Interp_Div = 550;
-        cm = load([BaseLoc 'Calibration_data\Camera_LinesFit_Example'],...
-             'cx0', 'cy0', 'cdx', 'cdy');
-        pr=load([BaseLoc 'Calibration_data\Projector_LinesFit_Example'],...
-             'cx0', 'cy0', 'cdx', 'cdy');
+        cm = load(fullfile(BaseLoc, 'Calibration_data', ...
+             'Camera_LinesFit_Example'), 'cx0', 'cy0', 'cdx', 'cdy');
+        pr = load(fullfile(BaseLoc, 'Calibration_data', ...
+             'Projector_LinesFit_Example'), 'cx0', 'cy0', 'cdx', 'cdy');
          
 
     case 3 %------------------------------------- In a rotating square tank
-        imagedir    = 'Case_Photos\Undulated_Plate\With_Rotation\';
+        imagedir    = fullfile('Case_Photos', 'Undulated_Plate', ...
+                                'With_Rotation');
         camdotsfile = 'DotsInCam_Undulated_Rotating.mat';
         sortedfile  = 'SortedDots_Undulated_Rotating.mat';
-        Reconstruct = 'Measurements\Reconstruct_Undulated_Rotating.mat';
+        Reconstruct = fullfile('Measurements', ...
+                                'Reconstruct_Undulated_Rotating.mat');
         Pattern_Fl  = 'Pattern_Base.mat';
         thrsh = 0;
         Rrange = [5,10];
@@ -97,10 +105,11 @@ switch measurement
 %------------------------------------------ Measurement of Three Cylinders%
 %=========================================================================%
     case 4 %------------------------------------ Standing cylinders 1st try
-        imagedir    = 'Case_Photos\Cylinders\cylinders_1\';
+        imagedir    = fullfile('Case_Photos', 'Cylinders', 'cylinders_1');
         camdotsfile = 'DotsInCam_Cylinders_1.mat';
         sortedfile  = 'SortedDots_Cylinders_1.mat';
-        Reconstruct = 'Measurements\Reconstruct_Cylinders1_mess.mat';
+        Reconstruct = fullfile('Measurements', ...
+                                'Reconstruct_Cylinders1_mess.mat');
         Pattern_Fl  = 'Pattern_Base.mat';
         thrsh = 0;
         Rrange = [5,10];
@@ -108,10 +117,11 @@ switch measurement
         Interp_Div = 200;
         
     case 5 %------------------ Standing cylinders. Artificial dot selection
-        imagedir    = 'Case_Photos\Cylinders\cylinders_1\';
+        imagedir    = fullfile('Case_Photos', 'Cylinders', 'cylinders_1');
         camdotsfile = 'DotsInCam_Cylinders_1.mat';
         sortedfile  = 'SortedDots_Cylinders_1_Artificial.mat';
-        Reconstruct = 'Measurements\Reconstruct_Cylinders1_Artificial.mat';
+        Reconstruct = fullfile('Measurements', ...
+                                'Reconstruct_Cylinders1_Artificial.mat');
         Pattern_Fl  = 'Pattern_Base.mat';
         thrsh = 0;
         Rrange = [5,10];
@@ -122,10 +132,11 @@ switch measurement
 %----------------------------------------------- Sediment Bed Measurements%
 %=========================================================================%
     case 6 %------------------------------------------- "Flat" Sediment Bed
-        imagedir    = 'Case_Photos\Sediment\Flat\';
+        imagedir    = fullfile('Case_Photos', 'Sediment', 'Flat');
         camdotsfile = 'DotsInCam_Sediment_Flat.mat';
         sortedfile  = 'SortedDots_Sediment_Flat.mat';
-        Reconstruct = 'Measurements\Reconstruct_Sediment_Flat.mat';
+        Reconstruct = fullfile('Measurements', ...
+                                'Reconstruct_Sediment_Flat.mat');
         Pattern_Fl  = 'Pattern_Base.mat';
         thrsh = 0;
         Rrange = [4,9];
@@ -135,10 +146,11 @@ switch measurement
         Interp_Div = 200;                
         
     case 7 %---------------------- Sediment bed Distubed by a strong vortex
-        imagedir    = 'Case_Photos\Sediment\Disturbed\';
+        imagedir    = fullfile('Case_Photos', 'Sediment', 'Disturbed');
         camdotsfile = 'DotsInCam_Sediment_VortexDisturbed.mat';
         sortedfile  = 'SortedDots_Sediment_VortexDisturbed.mat';
-        Reconstruct = 'Measurements\Reconstruct_Sediment_Disturbed.mat';
+        Reconstruct = fullfile('Measurements', ...
+                                'Reconstruct_Sediment_Disturbed.mat');
         Pattern_Fl  = 'Pattern_Base.mat';
         thrsh = 0;  
         Rrange = [4,9];
@@ -153,9 +165,9 @@ end
 
 %-------------------------- Data file where the (pixel) position of the dot 
 %-------------------------- patterns sent to the projector are saved.
-PatternFile  = [BaseLoc 'Patterns\' Pattern_Fl];
-infofile = [BaseLoc StepSave 'Projected_DotLocation_case' ...
-    num2str(measurement) '.mat'];
+PatternFile  = fullfile(BaseLoc, 'Patterns', Pattern_Fl);
+infofile = fullfile(BaseLoc, StepSave, ['Projected_DotLocation_case' ...
+    num2str(measurement) '.mat']);
 
 % Find if file with dot positions already exists. If file already exists 
 % (and chosen), load the data. If no file is found (or not chosen), a  
@@ -218,7 +230,7 @@ pattern.y = ceny + sin(theta)*(pattern.x - cenx) ...
 
 % Name the data file where the (pixel) position of the photographed dot 
 % patterns will be saved.
-infofile = [BaseLoc StepSave camdotsfile];
+infofile = fullfile(BaseLoc, StepSave, camdotsfile);
 
 % Load values or indicate that a file with the position of the dots
 % requires to be created.
@@ -234,7 +246,7 @@ end
 % Create file containing the positions (x,y) of the dots photographed. 
 if create_new    
     % Make a list of all saved photographed patterns
-    files = dir([imagedir, '*.png']);
+    files = dir(fullfile(imagedir, '*.png'));
     names = sort({files.name});
     clear camdots
     for ii = 1:npos % cycle through each pattern projected
@@ -261,7 +273,7 @@ end
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 
 % Name the data file where the position of the sorted dots will be saved
-infofile = [BaseLoc StepSave sortedfile];
+infofile = fullfile(BaseLoc, StepSave, sortedfile);
 create_new = true;
 
 % Load values or indicate that a file with the sorted dot posiotion needs
@@ -485,7 +497,7 @@ yrange = linspace(min(output(:,2)),max(output(:,2)),Interp_Div);
 vq = griddata(x,y,v,xq,yq, 'cubic');
 
 % save both the original measurements and the re-grided interpolation
-save([BaseLoc Reconstruct],'Pmid','xq','yq','vq');
+save(fullfile(BaseLoc, Reconstruct), 'Pmid', 'xq', 'yq', 'vq');
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %==================== Plot resulting reconstruction ======================%

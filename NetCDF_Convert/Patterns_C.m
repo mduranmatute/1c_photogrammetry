@@ -1,12 +1,12 @@
-Base_Loc = '..\Examples\Data_Files\MATLAB\Patterns\';
-SaveB_Loc = '..\Examples\Data_Files\NETCDF\Patterns\';
+Base_Loc = fullfile('..', 'Examples', 'Data_Files', 'MATLAB', 'Patterns');
+SaveB_Loc = fullfile('..', 'Examples', 'Data_Files', 'NETCDF', 'Patterns');
 
-files = dir([Base_Loc '*.mat']);
+files = dir(fullfile(Base_Loc, '*.mat'));
 names = sort({files.name});
 nz = numel(names);
 
 for iz = 1:nz
-    Filename = [Base_Loc, names{iz}];
+    Filename = fullfile(Base_Loc, names{iz});
     PatternFile = load(Filename);
 
     Pattern = PatternFile.DotsToProject(:,:,:) * 1;
@@ -24,7 +24,7 @@ for iz = 1:nz
         %cd(SaveB_Loc)
         Name_sep = regexp(names{iz}, '\.', 'split');
         NCF_name = [Name_sep{1} '.nc'];
-        ncid = netcdf.create([SaveB_Loc NCF_name],'NC_WRITE');
+        ncid = netcdf.create(fullfile(SaveB_Loc, NCF_name),'NC_WRITE');
         
 %======================================================== Define dimensions
         dimidNPat = netcdf.defDim(ncid,'Num_Pattern',N_dim);        
@@ -106,18 +106,5 @@ for iz = 1:nz
         netcdf.putVar(ncid,PatternImg_ID,Pattern);                
         %We're done, close the netcdf
         netcdf.close(ncid);
-% 
+%
 end
-
-
-Patt = ncread([SaveB_Loc 'CalibrationPattern_Example.nc'],'Pattern_Images');
-imgname=['C:\Users\agonzalez\surfdrive\Work\Photogrammetry\Examples\'...
-    'Calibration\Photographs\Projector\z_7\Proj_z7_img_1_0016.png'];
-Icam = imread(imgname);
-Ipat = Patt(:,:,1);
-figure()
- subplot(2,1,1); imagesc(Ipat);
-        title('pattern dots');
-        subplot(2,1,2); imagesc(Icam); 
-        colormap(([1:255; 1:255; 1:255])'/256);
-        title('image dots');
