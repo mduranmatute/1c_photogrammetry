@@ -18,24 +18,30 @@ Lens_pass = 0; % Force the use of an additional plane in the calibration.
 addpath(fullfile(fileparts(mfilename('fullpath')), 'Common_Functions'));
                                     % Folder containing the functions used
                                     % in the script.
-SavLoc = ''; % Root location where data is saved. 
 imagedir  = ''; % Location of the photographs used for the calibration.
-zlevels = []; % These are the heights (in mm) at which the calibration 
+zlevels = []; % These are the heights (in mm) at which the calibration
               % plate was photographed.
-        
+
 %Name and location where the camera calibration file will be saved.
 Save_name = [];
+
+assert(~isempty(imagedir), ...
+    'Set imagedir to the folder containing the calibration photographs.');
+assert(~isempty(zlevels), ...
+    'Set zlevels to the calibration plate heights (mm) that were photographed.');
+assert(~isempty(Save_name), ...
+    'Set Save_name to where the camera calibration file should be saved.');
+
 nz = numel(zlevels); % Number of levels at which the calibration plate was
                      % photographed.
 
 % Approximate horizontal position (in pixels) of the camera lens.
-Plens_pixels = [.0,.0]; 
-
-% Approximate vertical position (in mm) of the camera lens.
-Zlens        = [0,0];     % mm
+Plens_pixels = [.0,.0];
 
 %% This part of the script is used to find dots in an image
 infofile = []; % data file where the unprocessed dot location is stored.
+assert(~isempty(infofile), ...
+    'Set infofile to where the raw dot positions should be saved/loaded.');
 create_new = true;
 if exist(infofile, 'file') % Find if file already exists.
     a = input('using the saved dot positions <y> ? ','s');
@@ -84,6 +90,8 @@ end
 % found by the [find_circles] function.
 
 infofile = [];
+assert(~isempty(infofile), ...
+    'Set infofile to where the sorted dot positions should be saved/loaded.');
 
 create_new = true; % As before, determine if file already exists and load
                    % if chosen.
