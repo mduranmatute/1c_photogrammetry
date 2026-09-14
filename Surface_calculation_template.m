@@ -30,6 +30,10 @@ load('refraction', 'Nwater', 'Nair'); % Load air and water index of
 % Projector_Calibration_Template.m.
 Cam_File  = '';
 Proj_File = '';
+assert(~isempty(Cam_File), ...
+    'Set Cam_File to the camera calibration file (.mat) produced by the camera calibration step.');
+assert(~isempty(Proj_File), ...
+    'Set Proj_File to the projector calibration file (.mat) produced by the projector calibration step.');
 cm = load(Cam_File,  'cx0', 'cy0', 'cdx', 'cdy');
 pr = load(Proj_File, 'cx0', 'cy0', 'cdx', 'cdy');
 
@@ -42,10 +46,21 @@ sortedfile  = '';
 Reconstruct = '';
 % Pattern used for measurements
 Pattern_Fl  = '';
-        
-thrsh = 0; % Thereshold value that will be ignored when processing 
+
+assert(~isempty(imagedir), ...
+    'Set imagedir to the folder containing the measurement photographs.');
+assert(~isempty(camdotsfile), ...
+    'Set camdotsfile to where the photographed dot positions should be saved/loaded.');
+assert(~isempty(sortedfile), ...
+    'Set sortedfile to where the sorted dot positions should be saved/loaded.');
+assert(~isempty(Reconstruct), ...
+    'Set Reconstruct to where the reconstruction result should be saved.');
+assert(~isempty(Pattern_Fl), ...
+    'Set Pattern_Fl to the .mat file containing the projected dot patterns.');
+
+thrsh = 0; % Thereshold value that will be ignored when processing
                    % the photographs of the projected dots.
-Rrange = []; % Range of radii [2x1] used for the dot detection in the 
+Rrange = []; % Range of radii [2x1] used for the dot detection in the
                          % images sent to the projector
 DotR = []; % Range of radii [2x1] used for the dot detection in the
                        % photographed patterns
@@ -58,7 +73,9 @@ Interp_Div = 200; %Used for grid interpolation.
 %-------------------------- Data file where the (pixel) position of the dot 
 %-------------------------- patterns sent to the projector are saved.
 PatternFile  = Pattern_Fl;
-infofile = ''; % Rename
+infofile = ''; % Set to where the projected pattern dot positions should be saved/loaded.
+assert(~isempty(infofile), ...
+    'Set infofile to where the projected pattern dot positions should be saved/loaded.');
 
 % Find if file with dot positions already exists. If file already exists 
 % (and chosen), load the data. If no file is found (or not chosen), a  

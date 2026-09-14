@@ -19,21 +19,21 @@ Lens_pass = 0; % Force the use of an additional plane in the calibration.
 addpath(fullfile(fileparts(mfilename('fullpath')), 'Common_Functions'));
                                     % Folder containing the functions used
                                     % in the script.
-SavLoc = ''; % Root location where data is saved. 
 ImageDir = ''; % Location of the photographs used for the calibration.
-zlevels = []; % these are the heights in mm (from the bottom) at which 
+zlevels = []; % these are the heights in mm (from the bottom) at which
               % the patterns were photographed.
-% Name of the file that contains the dot pattern images
-PatternName = ''; 
-npos = 120; % Total number of patterns in the file. 
-            % The value of npos should match the number of images  
-            % photographed and be ordered accordingly for a correct 
-            % calibration. However, a lower value can be selected if 
+% Name and location of the file that contains the dot pattern images
+% (produced by the pattern-generation step; contains DotsToProject).
+Pattern_images_file = '';
+npos = 120; % Total number of patterns in the file.
+            % The value of npos should match the number of images
+            % photographed and be ordered accordingly for a correct
+            % calibration. However, a lower value can be selected if
             % pattern and images are consistent.
-        
-% The following values are used to finds circles with radii with 
+
+% The following values are used to finds circles with radii with
 % the range specified. Dependent on dot size.
-Im_Rrange = []; % For dot detection in the images sent to the projector. 
+Im_Rrange = []; % For dot detection in the images sent to the projector.
                 % Range values depend on the size of the dots in the
                 % images. size [2x1]. recomended above 4px for minimum
                 % value.
@@ -42,7 +42,18 @@ Pr_Rrange = []; % For the dot detection of the photographed patterns
 % name of the camera calibration file (.mat) to load.
 Save_name = '';
 Cam_File = '';
-         
+
+assert(~isempty(ImageDir), ...
+    'Set ImageDir to the folder containing the projector calibration photographs.');
+assert(~isempty(zlevels), ...
+    'Set zlevels to the heights (mm) at which the patterns were photographed.');
+assert(~isempty(Pattern_images_file), ...
+    'Set Pattern_images_file to the .mat file containing the projected dot patterns (DotsToProject).');
+assert(~isempty(Save_name), ...
+    'Set Save_name to where the projector calibration file should be saved.');
+assert(~isempty(Cam_File), ...
+    'Set Cam_File to the camera calibration file (.mat) produced by the camera calibration step.');
+
 % Load the polynomials from the camera calibration
 cm = load(Cam_File, 'cx0', 'cy0', 'cdx', 'cdy', 'Plens');
 
@@ -54,14 +65,20 @@ fittype = 'poly33';
 
 % Approximate position (in mm) of the projector lens.
 Plens = []; % 3x1 : (x,y,z)
+if Lens_pass
+    assert(~isempty(Plens), ...
+        'Set Plens to the approximate projector lens position (x,y,z) when Lens_pass is enabled.');
+end
 
 %% Determine the positions of the dots in each of the patterns sent to the 
 %  projector.
 
 % Data file where the (pixel) position of the dot patterns sent to the
 % projector are saved.
-infofile = ''; 
-        
+infofile = '';
+assert(~isempty(infofile), ...
+    'Set infofile to where the projected pattern dot positions should be saved/loaded.');
+
 create_new = true;
 if exist(infofile, 'file')% Find if file with dot positions already exists.
     a = input('using the saved pattern dots positions <y> ? ','s');
@@ -76,7 +93,6 @@ end
 %
 if create_new
     % Load the file with the dot pattern images.
-    Pattern_images_file = '';
     PatternPrj = load(Pattern_images_file);
     
     % Determine the amount of pattern images
@@ -94,9 +110,11 @@ end
 
 %% Determine the positions of dots of the photographed patterns
 
-% Name the data file where the (pixel) position of the photographed dot 
+% Name the data file where the (pixel) position of the photographed dot
 % patterns will be saved.
-infofile = ''; 
+infofile = '';
+assert(~isempty(infofile), ...
+    'Set infofile to where the photographed dot positions should be saved/loaded.');
 
 % Load values or create file with the position of the dots
 create_new = true;
@@ -135,9 +153,11 @@ end
 % are eliminated.
 
 % Name the data file where the position of the sorted dots will be saved
-infofile = ''; 
+infofile = '';
+assert(~isempty(infofile), ...
+    'Set infofile to where the sorted dot positions should be saved/loaded.');
 
-% Load or create new file.        
+% Load or create new file.
 create_new = true;
 if exist(infofile, 'file')
     a = input('using the saved clicked positions <y> ? ','s');
