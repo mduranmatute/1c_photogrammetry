@@ -19,33 +19,22 @@ function [Mx,My] = magnification_A(fitp)
     % Mx = sqrt((du/dX)^2 + (dv/dX)^2)
     
     CCDmid = [800,600]; %mid location in the ccd (pixels)
-    
-    P0 = [fitp.cX(CCDmid), fitp.cY(CCDmid)];
-    
+
+    P0 = [eval_poly(fitp.cX, CCDmid(1), CCDmid(2)), ...
+          eval_poly(fitp.cY, CCDmid(1), CCDmid(2))];
+
     [dxdX,dxdY] = derivatives(fitp.cx, P0(1),P0(2));
     [dydX,dydY] = derivatives(fitp.cy, P0(1),P0(2));
     Mx = sqrt(dxdX^2 + dydX^2);
     My = sqrt(dxdY^2 + dydY^2);
 end
 
-function [dudx, dudy] = derivatives(c,x,y)
-    names  = coeffnames(c);
-    parval = coeffvalues(c);
-    npar   = size(names,1);
-    
-    dudx = 0;
-    dudy = 0;
-    for i = 1:npar
-        s = names{i};
-        nx = s(2) - '0'; 
-        ny = s(3) - '0';
-        
-        a = parval(i);
-        if nx >= 1
-            dudx = dudx + a * nx* x.^(nx-1) .* y.^ny;
-        end
-        if ny >= 1
-            dudy = dudy + a * ny* x.^nx .* y.^(ny-1);
-        end
-    end
+function [dudx, dudy] = derivatives(pf,x,y)
+    % Analytic partial derivatives of the poly33 model
+    % z = p00 + p10 x + p01 y + p20 x^2 + p11 xy + p02 y^2
+    %        + p30 x^3 + p21 x^2 y + p12 x y^2 + p03 y^3
+    dudx = pf.p10 + 2*pf.p20*x + pf.p11*y ...
+         + 3*pf.p30*x.^2 + 2*pf.p21*x.*y + pf.p12*y.^2;
+    dudy = pf.p01 + pf.p11*x + 2*pf.p02*y ...
+         + pf.p21*x.^2 + 2*pf.p12*x.*y + 3*pf.p03*y.^2;
 end

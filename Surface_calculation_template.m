@@ -260,11 +260,11 @@ yp = pattern.y;
 
 % Obtain the direction vector and origin from the projector calibration and
 % dot pixel position.
-pr_x0 = pr.cx0(xp, yp);
-pr_y0 = pr.cy0(xp, yp);
+pr_x0 = eval_poly(pr.cx0, xp, yp);
+pr_y0 = eval_poly(pr.cy0, xp, yp);
 pr_z0 = zeros(size(xp));
-pr_dx = pr.cdx(xp, yp);
-pr_dy = pr.cdy(xp, yp);
+pr_dx = eval_poly(pr.cdx, xp, yp);
+pr_dy = eval_poly(pr.cdy, xp, yp);
 pr_dz = ones(size(xp));
 
 % When the setup is rotating, the distance from the center of the tank is
@@ -320,11 +320,11 @@ end
 
 % Obtain the direction vector and origin from the camera calibration and
 % dot pixel position.
-cm_x0 = cm.cx0(x, y);
-cm_y0 = cm.cy0(x, y);
+cm_x0 = eval_poly(cm.cx0, x, y);
+cm_y0 = eval_poly(cm.cy0, x, y);
 cm_z0 = zeros(size(x));
-cm_dx = cm.cdx(x, y);
-cm_dy = cm.cdy(x, y);
+cm_dx = eval_poly(cm.cdx, x, y);
+cm_dy = eval_poly(cm.cdy, x, y);
 cm_dz = ones(size(x));
 
 %=========================== Find where the "lines" in space intersect the

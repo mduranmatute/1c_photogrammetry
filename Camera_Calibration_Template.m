@@ -126,12 +126,12 @@ for loop = 1:2
         xp = img_dots(iz).x;  yp = img_dots(iz).y; 
        
         % fitting grid coordinates -> pixel coordinates
-        fitp(iz).cx = fit([X,Y], xp, fittype);
-        fitp(iz).cy = fit([X,Y], yp, fittype);
+        fitp(iz).cx = fit_poly([X,Y], xp, fittype);
+        fitp(iz).cy = fit_poly([X,Y], yp, fittype);
 
         % fitting pixel coordinates -> real-world coordinates
-        fitp(iz).cX = fit([xp,yp], X, fittype);
-        fitp(iz).cY = fit([xp,yp], Y, fittype);
+        fitp(iz).cX = fit_poly([xp,yp], X, fittype);
+        fitp(iz).cY = fit_poly([xp,yp], Y, fittype);
     end
 
     if loop == 1
@@ -141,8 +141,8 @@ for loop = 1:2
         % The position of the plate at the bottom is taken as reference.
         clear X Y Xshift Yshift
         for iz = 1:nz
-            X(iz) =  fitp(iz).cX(Plens_pixels(1), Plens_pixels(2)); 
-            Y(iz) =  fitp(iz).cY(Plens_pixels(1), Plens_pixels(2)); 
+            X(iz) =  eval_poly(fitp(iz).cX, Plens_pixels(1), Plens_pixels(2));
+            Y(iz) =  eval_poly(fitp(iz).cY, Plens_pixels(1), Plens_pixels(2));
         end
         Xshift = X - X(1);
         Yshift = Y - Y(1);
@@ -166,9 +166,9 @@ for iz = 1:nz
 end
 meanMinv = 1./mean([Mx;My]);
 
-c = fit(meanMinv', zlevels', 'poly1');
-fprintf('by magn. : Z-lens = %.3f\n', c(0));
-Plens(3) = c(0);
+c = fit_poly(meanMinv', zlevels', 'poly1');
+fprintf('by magn. : Z-lens = %.3f\n', eval_poly(c, 0));
+Plens(3) = eval_poly(c, 0);
 
 %% --- Finding formulas to convert pixel coordinates to lines in space ---
 % For a more in depth description of the conversion via third order
@@ -202,8 +202,8 @@ ic = 1;
 for iz = 1:Nz
     % calculate the real-world coordinates for xp,yp in each iz plane.
     if iz <= nz
-        X = fitp(iz).cX(xp,yp);
-        Y = fitp(iz).cY(xp,yp);
+        X = eval_poly(fitp(iz).cX, xp, yp);
+        Y = eval_poly(fitp(iz).cY, xp, yp);
         Z = zlevels(iz) * ones(size(X));
     else
         X = Plens(ic,1) * ones(size(X));
@@ -225,10 +225,10 @@ xof = (Sx - xrc.*Sz)./Nz;
 yrc = (Nz*Syz - Sy.*Sz)./(Nz*Szz - Sz.^2);
 yof = (Sy - yrc.*Sz)./Nz;		
 
-cx0 = fit([xp,yp], xof, fittype);
-cdx = fit([xp,yp], xrc, fittype);
-cy0 = fit([xp,yp], yof, fittype);
-cdy = fit([xp,yp], yrc, fittype);
+cx0 = fit_poly([xp,yp], xof, fittype);
+cdx = fit_poly([xp,yp], xrc, fittype);
+cy0 = fit_poly([xp,yp], yof, fittype);
+cdy = fit_poly([xp,yp], yrc, fittype);
 
 % % x0,y0 is the intersection point with the z=0 plane
 % % dx,dy is the pointing vector, with dz = 1

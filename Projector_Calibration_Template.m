@@ -232,8 +232,8 @@ for iz = 1:nz
     % found to belong to the projected dots are converted to 3D-planes
     x = cam.x;
     y = cam.y;
-    observed(iz).x = cm.cx0(x,y) + zlevels(iz) * cm.cdx(x,y);
-    observed(iz).y = cm.cy0(x,y) + zlevels(iz) * cm.cdy(x,y);
+    observed(iz).x = eval_poly(cm.cx0,x,y) + zlevels(iz) * eval_poly(cm.cdx,x,y);
+    observed(iz).y = eval_poly(cm.cy0,x,y) + zlevels(iz) * eval_poly(cm.cdy,x,y);
     observed(iz).z = zlevels(iz) * ones(size(x));
 
     % Since the calibration plate did not cover the complete projection
@@ -297,10 +297,10 @@ xof = (Sx - xrc.*Sz)./nZ;
 yrc = (nZ*Syz - Sy.*Sz)./(nZ*Szz - Sz.^2);
 yof = (Sy - yrc.*Sz)./nZ;		
 
-cx0 = fit([xp,yp], xof, fittype);
-cdx = fit([xp,yp], xrc, fittype);
-cy0 = fit([xp,yp], yof, fittype);
-cdy = fit([xp,yp], yrc, fittype);
+cx0 = fit_poly([xp,yp], xof, fittype);
+cdx = fit_poly([xp,yp], xrc, fittype);
+cy0 = fit_poly([xp,yp], yof, fittype);
+cdy = fit_poly([xp,yp], yrc, fittype);
 
 %% Save projector calibration fit to file. 
 % Save vector origin a0 and its components a, the projector Lens Location 

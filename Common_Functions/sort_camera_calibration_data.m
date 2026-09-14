@@ -68,11 +68,11 @@ function [griddots, camdots] = sort_camera_calibration_data(Icam, grid, ...
         end
 
         %% The relation between the clicked points is used to find the rest
-        cx = fit([xpat',ypat'], xcam', 'poly11');
-        cy = fit([xpat',ypat'], ycam', 'poly11');
+        cx = fit_poly([xpat',ypat'], xcam', 'poly11');
+        cy = fit_poly([xpat',ypat'], ycam', 'poly11');
         % estimated position of all the dots in the camera image
-        x = cx(grid.X, grid.Y);   
-        y = cy(grid.X, grid.Y);
+        x = eval_poly(cx, grid.X, grid.Y);
+        y = eval_poly(cy, grid.X, grid.Y);
         % Plot estimated position
         hold on; plot(x,y,'gx'); hold off
         
@@ -95,11 +95,11 @@ function [griddots, camdots] = sort_camera_calibration_data(Icam, grid, ...
         plot(camdots.x(k2), camdots.y(k2), 'rs', 'markersize',14);
         hold off;
 
-        cx = fit([grid.X(k1), grid.Y(k1)], camdots.x(k2), 'poly33');
-        cy = fit([grid.X(k1), grid.Y(k1)], camdots.y(k2), 'poly33');
+        cx = fit_poly([grid.X(k1), grid.Y(k1)], camdots.x(k2), 'poly33');
+        cy = fit_poly([grid.X(k1), grid.Y(k1)], camdots.y(k2), 'poly33');
 
-        x = cx(grid.X, grid.Y);
-        y = cy(grid.X, grid.Y);
+        x = eval_poly(cx, grid.X, grid.Y);
+        y = eval_poly(cy, grid.X, grid.Y);
         hold on; plot(x,y,'ys','markersize',10); hold off
         title('yellow squares are the predicted positions'); 
         

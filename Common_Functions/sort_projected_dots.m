@@ -73,11 +73,11 @@ function camdots = sort_projected_dots(Ipat, Icam, patdots, camdots)
         end
 
         %% The relation between the clicked points is used to find the rest
-        cx = fit([xpat',ypat'], xcam', 'poly11');
-        cy = fit([xpat',ypat'], ycam', 'poly11');
+        cx = fit_poly([xpat',ypat'], xcam', 'poly11');
+        cy = fit_poly([xpat',ypat'], ycam', 'poly11');
         % estimated position of all the dots in the camera image
-        x = cx(patd.x, patd.y);   
-        y = cy(patd.x, patd.y);
+        x = eval_poly(cx, patd.x, patd.y);
+        y = eval_poly(cy, patd.x, patd.y);
         % Plot estimated positions to the previous image
         hold on; plot(x,y,'gx'); hold off
         
@@ -99,11 +99,11 @@ function camdots = sort_projected_dots(Ipat, Icam, patdots, camdots)
         plot(camd.x(k2), camd.y(k2), 'rs', 'markersize',14); 
         hold off;
 
-        cx = fit([patd.x(k1), patd.y(k1)], camd.x(k2), 'poly33');
-        cy = fit([patd.x(k1), patd.y(k1)], camd.y(k2), 'poly33');
+        cx = fit_poly([patd.x(k1), patd.y(k1)], camd.x(k2), 'poly33');
+        cy = fit_poly([patd.x(k1), patd.y(k1)], camd.y(k2), 'poly33');
 
-        x = cx(patd.x, patd.y);
-        y = cy(patd.x, patd.y);
+        x = eval_poly(cx, patd.x, patd.y);
+        y = eval_poly(cy, patd.x, patd.y);
         hold on; plot(x,y,'ys','markersize',10); hold off
         title('yellow squares are the predicted positions'); 
         
@@ -123,8 +123,8 @@ function camdots = sort_projected_dots(Ipat, Icam, patdots, camdots)
         camd = camdots(ii);
         
         % estimated position of all the dots in the camera image
-        x = cx(patd.x, patd.y);
-        y = cy(patd.x, patd.y);
+        x = eval_poly(cx, patd.x, patd.y);
+        y = eval_poly(cy, patd.x, patd.y);
         hold on; plot(x,y,'gx'); hold off
 
         Rsearch = 50;
