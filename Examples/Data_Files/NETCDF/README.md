@@ -1,8 +1,9 @@
 # Dataset description: NetCDF example data for single-camera photogrammetry
 
 This document describes the collection of NetCDF (`.nc`) files in this
-directory for the purpose of archiving them in a FAIR data repository (e.g.
-4TU.ResearchData, Zenodo, DANS). It accompanies, but is independent of, the
+directory, together with the companion `Case_Photos.zip` archive of raw
+photographs (see Section 11.5), for the purpose of archiving them in a FAIR
+data repository. It accompanies, but is independent of, the
 `1c_photogrammetry` code repository.
 
 ## 1. Title
@@ -31,6 +32,11 @@ file carries global attributes with authorship and provenance information).
 Corresponding data are also available in MATLAB `.mat` format in
 `Examples/Data_Files/MATLAB/` of the source code repository; both formats
 contain the same content.
+
+The raw camera photographs from which the `DotsInCam_*.nc` files were
+derived are included as a separate ZIP archive, `Case_Photos.zip` (see
+Section 11.5), so that the full pipeline can be reproduced from the original
+images rather than only from the already-processed dot positions.
 
 ## 3. Related publication
 
@@ -71,9 +77,10 @@ camera calibration, refraction, fluid interface, digital projector, NetCDF
 ## 8. License
 
 CC BY 4.0 (Creative Commons Attribution 4.0 International). Reuse is
-permitted provided the source (the publication above) is credited. Note this
-applies to the *data*; the accompanying processing code is released under the
-Apache License 2.0 (see the `LICENSE` file of the code repository).
+permitted provided the source (the publication above) is credited. This
+applies to the *data*, including the NetCDF files and the `Case_Photos.zip`
+raw-photograph archive; the accompanying processing code is released under
+the Apache License 2.0 (see the `LICENSE` file of the code repository).
 
 ## 9. Format and conventions
 
@@ -98,17 +105,23 @@ Apache License 2.0 (see the `LICENSE` file of the code repository).
 
 - Missing/non-existent values (e.g. dots that were not detected) are encoded
   as `NaN` in floating-point variables.
-- Total collection size: ~377 MB across 35 files.
+- Total collection size: ~377 MB across 35 NetCDF files, plus a ~610 MB
+  companion `Case_Photos.zip` archive of raw PNG photographs (Section 11.5).
 
 ## 10. Directory structure and file naming
 
 ```
-NETCDF/
-├── Calibration_Data/            camera & projector calibration coefficients
-├── Patterns/                    projected dot-pattern images
-├── Data_process_steps/
-│   └── Measurements/            intermediate dot-detection/sorting results
-└── Measurements/                final reconstructed 3D surfaces
+Examples/
+├── Data_Files/
+│   └── NETCDF/                      (this directory)
+│       ├── README.md                this file
+│       ├── Calibration_Data/        camera & projector calibration coefficients
+│       ├── Patterns/                projected dot-pattern images
+│       ├── Data_process_steps/
+│       │   └── Measurements/        intermediate dot-detection/sorting results
+│       └── Measurements/            final reconstructed 3D surfaces
+└── Measurements/
+    └── Case_Photos.zip              raw photographs (companion archive, Section 11.5)
 ```
 
 Filenames encode the measurement case:
@@ -203,6 +216,52 @@ interpolated surface elevation grid.
 | `Y_int` | `Y_int` (case-dependent) | mm | Vertical coordinate of the interpolation grid |
 | `Measurements` | 3 × `Num_Points` | mm | 3D coordinates `(x, y, z)` of each measured point, stacked as `x:(1:Num_Points,1)`, `y:(1:Num_Points,2)`, `z:(1:Num_Points,3)` |
 | `Surface` | `Y_int` × `X_int` | mm | Surface elevation interpolated onto the regular `(X_int, Y_int)` grid |
+
+### 11.5 `Case_Photos.zip` — companion raw-photograph archive
+
+Location: `Examples/Measurements/Case_Photos.zip` (a sibling of this
+`Data_Files/NETCDF/` directory, not inside it). Format: ZIP, containing 720
+uncompressed-inside PNG photographs (~610 MB total, ~611 MB unpacked)
+organized by measurement case:
+
+```
+Case_Photos/
+├── Cylinders/
+│   └── cylinders_1/                 120 photographs
+├── Sediment/
+│   ├── Flat/                        120 photographs
+│   └── Disturbed/                   120 photographs
+└── Undulated_Plate/
+    ├── Low_Resolution/              120 photographs
+    ├── High_Resolution/             120 photographs
+    └── With_Rotation/               120 photographs
+```
+
+These are the original camera photographs of each of the 120 projected dot
+patterns, for each measurement case, taken with the surface (cylinders,
+sediment bed, or undulated plate) present. They are the raw input to
+pipeline step 04 ("find dots in the photographs"; see Section 12) and are
+each case's rawest form of data: `DotsInCam_<case>.nc` (Section 11.3) is
+the pixel-position output of running dot detection on these images, so the
+photographs are not needed to reproduce the reconstruction from
+`DotsInCam_*.nc` onward, but they are needed to reproduce or re-run the
+dot-detection step itself, or to apply alternative image-processing methods.
+
+The case subdirectory names correspond to the case labels in Section 10 as
+follows:
+
+| `Case_Photos/` subdirectory | Corresponding `DotsInCam_*.nc` file |
+|---|---|
+| `Cylinders/cylinders_1/` | `DotsInCam_Cylinders.nc`, `DotsInCam_Cylinders_1.nc` |
+| `Sediment/Flat/` | `DotsInCam_Sediment_Flat.nc` |
+| `Sediment/Disturbed/` | `DotsInCam_Sediment_VortexDisturbed.nc` |
+| `Undulated_Plate/Low_Resolution/` | `DotsInCam_Undulated_BaseR.nc` |
+| `Undulated_Plate/High_Resolution/` | `DotsInCam_Undulated_HighR.nc` |
+| `Undulated_Plate/With_Rotation/` | `DotsInCam_Undulated_Rotating.nc` |
+
+The example script `Examples/Measure_underwater.m` of the code repository
+reads photographs from this same relative path structure
+(`Case_Photos/<case>/...`).
 
 ## 12. Methodology
 
