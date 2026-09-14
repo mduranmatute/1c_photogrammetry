@@ -230,6 +230,15 @@ for ii = 1:npos
     pattern.y = [pattern.y; patdots(ii).y];
 end
 
+% Extent of the calibration plate, used below to discard projector dots
+% that fall outside the plate. See [Common_Functions/calibration_plate_
+% grid.m] for the plate geometry.
+plate = calibration_plate_grid();
+plate_xmin = plate.center_x - (plate.nx-1)/2*plate.dx;
+plate_xmax = plate.center_x + (plate.nx-1)/2*plate.dx;
+plate_ymin = plate.center_y - (plate.ny-1)/2*plate.dy;
+plate_ymax = plate.center_y + (plate.ny-1)/2*plate.dy;
+
 % Now a variable where the positions of the dots found in the photographs
 % will be combined is initialized.
 for iz = 1:nz
@@ -244,8 +253,8 @@ for iz = 1:nz
     % found to belong to the projected dots are converted to 3D-planes
     x = cam.x;
     y = cam.y;
-    observed(iz).x = cm.cx0(x,y) + zlevels(iz) * cm.cdx(x,y);
-    observed(iz).y = cm.cy0(x,y) + zlevels(iz) * cm.cdy(x,y);
+    observed(iz).x = eval_poly(cm.cx0,x,y) + zlevels(iz) * eval_poly(cm.cdx,x,y);
+    observed(iz).y = eval_poly(cm.cy0,x,y) + zlevels(iz) * eval_poly(cm.cdy,x,y);
     observed(iz).z = zlevels(iz) * ones(size(x));
     
     if(PlotCheck) % plot the viewed dots
@@ -256,8 +265,8 @@ for iz = 1:nz
     % area, the dots that fall over the plate are removed. The position 
     % values at which the dots are eliminated are given by the plates
     % dimensions. 
-    k = find(observed(iz).x < 25 | observed(iz).x > 575 | ...
-             observed(iz).y < 25 | observed(iz).y > 575);
+    k = find(observed(iz).x < plate_xmin | observed(iz).x > plate_xmax | ...
+             observed(iz).y < plate_ymin | observed(iz).y > plate_ymax);
     observed(iz).x(k) = nan;
     observed(iz).y(k) = nan;
     observed(iz).z(k) = nan;
@@ -319,10 +328,10 @@ xof = (Sx - xrc.*Sz)./nZ;
 yrc = (nZ*Syz - Sy.*Sz)./(nZ*Szz - Sz.^2);
 yof = (Sy - yrc.*Sz)./nZ;		
 
-cx0 = fit([xp,yp], xof, fittype);
-cdx = fit([xp,yp], xrc, fittype);
-cy0 = fit([xp,yp], yof, fittype);
-cdy = fit([xp,yp], yrc, fittype);
+cx0 = fit_poly([xp,yp], xof, fittype);
+cdx = fit_poly([xp,yp], xrc, fittype);
+cy0 = fit_poly([xp,yp], yof, fittype);
+cdy = fit_poly([xp,yp], yrc, fittype);
 
 %% Save projector calibration fit to file. 
 % Save vector origin a0 and its components a, the projector Lens Location 
@@ -338,10 +347,10 @@ if(PlotCheck)
     xp = patdots(1).x;
     yp = patdots(1).y;
 
-    x0 = cx0(xp,yp);
-    dx = cdx(xp,yp);
-    y0 = cy0(xp,yp);
-    dy = cdy(xp,yp);
+    x0 = eval_poly(cx0,xp,yp);
+    dx = eval_poly(cdx,xp,yp);
+    y0 = eval_poly(cy0,xp,yp);
+    dy = eval_poly(cdy,xp,yp);
 
     h1 = 0;             % draw the lines between the planes h1 and h2
     h2 = 1500;
@@ -356,10 +365,10 @@ if(PlotCheck)
     for iz = 1:nz
         x = image_dots(iz,1).x;
         y = image_dots(iz,1).y; 
-        cm_x0 = cm.cx0(x,y);
-        cm_y0 = cm.cy0(x,y);
-        cm_dx = cm.cdx(x,y);
-        cm_dy = cm.cdy(x,y);
+        cm_x0 = eval_poly(cm.cx0,x,y);
+        cm_y0 = eval_poly(cm.cy0,x,y);
+        cm_dx = eval_poly(cm.cdx,x,y);
+        cm_dy = eval_poly(cm.cdy,x,y);
 
         X = cm_x0 + cm_dx*zlevels(iz);
         Y = cm_y0 + cm_dy*zlevels(iz);

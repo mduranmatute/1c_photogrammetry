@@ -87,12 +87,14 @@ end
 
 
 %% grid coordinates in world coordinates of the calibration plate
-nx = 23;    % number of dots in x and y
-ny = 23;
-dx = 25;    % mesh size in mm
-dy = 25;
-xrange = 300 + (-11:11)*dx;       % take the centre of the axes 0,0
-yrange = 300 + (-11:11)*dy;       % y-axis to down
+% See [Common_Functions/calibration_plate_grid.m] for the plate geometry.
+plate = calibration_plate_grid();
+nx = plate.nx;    % number of dots in x and y
+ny = plate.ny;
+dx = plate.dx;    % mesh size in mm
+dy = plate.dy;
+xrange = plate.center_x + (-(nx-1)/2:(nx-1)/2)*dx; % take the centre of the axes 0,0
+yrange = plate.center_y + (-(ny-1)/2:(ny-1)/2)*dy; % y-axis to down
 [X,Y] = meshgrid(xrange, yrange);
 
 clear grid
@@ -140,12 +142,12 @@ for loop = 1:2
         xp = img_dots(iz).x;  yp = img_dots(iz).y; 
        
         % fitting grid coordinates -> pixel coordinates
-        fitp(iz).cx = fit([X,Y], xp, fittype);
-        fitp(iz).cy = fit([X,Y], yp, fittype);
-        
-        xfit = fitp(iz).cx(X,Y);
-        yfit = fitp(iz).cy(X,Y);
-        
+        fitp(iz).cx = fit_poly([X,Y], xp, fittype);
+        fitp(iz).cy = fit_poly([X,Y], yp, fittype);
+
+        xfit = eval_poly(fitp(iz).cx, X, Y);
+        yfit = eval_poly(fitp(iz).cy, X, Y);
+
         if(PlotCheck)
         % showing the fit result
         image(I{iz});
@@ -155,11 +157,11 @@ for loop = 1:2
         end
 
         % fitting pixel coordinates -> real-world coordinates
-        fitp(iz).cX = fit([xp,yp], X, fittype);
-        fitp(iz).cY = fit([xp,yp], Y, fittype);
-        
-        xfit = fitp(iz).cX(xp,yp); 
-        yfit = fitp(iz).cY(xp,yp);
+        fitp(iz).cX = fit_poly([xp,yp], X, fittype);
+        fitp(iz).cY = fit_poly([xp,yp], Y, fittype);
+
+        xfit = eval_poly(fitp(iz).cX, xp, yp);
+        yfit = eval_poly(fitp(iz).cY, xp, yp);
         
         if(PlotCheck)
         plot(X,Y,'o');
@@ -174,8 +176,8 @@ for loop = 1:2
         % The position of the plate at the bottom is taken as reference.
         clear X Y Xshift Yshift
         for iz = 1:nz
-            X(iz) =  fitp(iz).cX(Plens_pixels(1), Plens_pixels(2)); 
-            Y(iz) =  fitp(iz).cY(Plens_pixels(1), Plens_pixels(2)); 
+            X(iz) =  eval_poly(fitp(iz).cX, Plens_pixels(1), Plens_pixels(2));
+            Y(iz) =  eval_poly(fitp(iz).cY, Plens_pixels(1), Plens_pixels(2));
         end
         Xshift = X - X(1);
         Yshift = Y - Y(1);
@@ -203,9 +205,9 @@ if(PlotCheck)
     plot(zlevels, 1./Mx, '*-', zlevels, 1./My, '*-');
 end
 
-c = fit(meanMinv', zlevels', 'poly1');
-fprintf('by magn. : Z-lens = %.3f\n', c(0));
-Plens(3) = c(0);
+c = fit_poly(meanMinv', zlevels', 'poly1');
+fprintf('by magn. : Z-lens = %.3f\n', eval_poly(c, 0));
+Plens(3) = eval_poly(c, 0);
 
 %% --- Finding formulas to convert pixel coordinates to lines in space ---
 % For a more in depth description of the conversion via third order
@@ -239,8 +241,8 @@ ic = 1;
 for iz = 1:Nz
     % calculate the real-world coordinates for xp,yp in each iz plane.
     if iz <= nz
-        X = fitp(iz).cX(xp,yp);
-        Y = fitp(iz).cY(xp,yp);
+        X = eval_poly(fitp(iz).cX, xp, yp);
+        Y = eval_poly(fitp(iz).cY, xp, yp);
         Z = zlevels(iz) * ones(size(X));
     else
         X = Plens(ic,1) * ones(size(X));
@@ -267,10 +269,10 @@ xof = (Sx - xrc.*Sz)./Nz;
 yrc = (Nz*Syz - Sy.*Sz)./(Nz*Szz - Sz.^2);
 yof = (Sy - yrc.*Sz)./Nz;		
 
-cx0 = fit([xp,yp], xof, fittype);
-cdx = fit([xp,yp], xrc, fittype);
-cy0 = fit([xp,yp], yof, fittype);
-cdy = fit([xp,yp], yrc, fittype);
+cx0 = fit_poly([xp,yp], xof, fittype);
+cdx = fit_poly([xp,yp], xrc, fittype);
+cy0 = fit_poly([xp,yp], yof, fittype);
+cdy = fit_poly([xp,yp], yrc, fittype);
 
 % % x0,y0 is the intersection point with the z=0 plane
 % % dx,dy is the pointing vector, with dz = 1
@@ -290,10 +292,10 @@ if(PlotCheck)
     xp = art_xp;
     yp = art_yp;
 
-    x0 = cx0(xp,yp);
-    dx = cdx(xp,yp);
-    y0 = cy0(xp,yp);
-    dy = cdy(xp,yp);
+    x0 = eval_poly(cx0, xp, yp);
+    dx = eval_poly(cdx, xp, yp);
+    y0 = eval_poly(cy0, xp, yp);
+    dy = eval_poly(cdy, xp, yp);
 
     figure()
     h1 = 0;
