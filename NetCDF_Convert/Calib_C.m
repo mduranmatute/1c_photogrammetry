@@ -40,16 +40,25 @@ for iz = 1:nz
                 
     CoeffCal_cy0 = [CalibData.cy0.p00, CalibData.cy0.p10, ...
                     CalibData.cy0.p01, CalibData.cy0.p20, ...
-                    CalibData.cy0.p11, CalibData.cy0.p02, ... 
+                    CalibData.cy0.p11, CalibData.cy0.p02, ...
                     CalibData.cy0.p30, CalibData.cy0.p21, ...
                     CalibData.cy0.p12, CalibData.cy0.p03];
-    
+
+    % Lens position (x,y,z, in mm) and the calibration plate heights (mm)
+    % at which the plate/pattern was photographed. Previously not
+    % archived, so a calibration converted before this fix will not have
+    % had these values available for [Calib_NC2MAT.m] to reconstruct.
+    Plens_val = CalibData.Plens(:)';
+    Zlevels_val = CalibData.zlevels(:)';
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                         Save to NETCDF files                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %========================================= Value of the variable dimensions
         N_dim = length(CoeffCal_cy0);
         NL = 1:N_dim;
+        N_lens = numel(Plens_val);
+        N_lev = numel(Zlevels_val);
 
 %===================================================== Name and create file
         Name_sep = regexp(names{iz}, '\.', 'split');
@@ -57,8 +66,10 @@ for iz = 1:nz
         ncid = netcdf.create(fullfile(SaveB_Loc, NCF_name),'NC_WRITE');
         
 %======================================================== Define dimensions
-        dimidNCoef = netcdf.defDim(ncid,'Num_Coeff',N_dim);        
-      
+        dimidNCoef = netcdf.defDim(ncid,'Num_Coeff',N_dim);
+        dimidLens = netcdf.defDim(ncid,'Lens_dim',N_lens);
+        dimidLevels = netcdf.defDim(ncid,'Num_Levels',N_lev);
+
 %=============================== Define IDs for the the dimension variables
         NPol_ID = netcdf.defVar(ncid,'Num_Coeff','NC_Byte',[dimidNCoef]);
         netcdf.putAtt(ncid,NPol_ID,'long_name',...
@@ -116,7 +127,22 @@ for iz = 1:nz
             'val(x,y) = p00 + p10*x + p01*y + p20*x^2 + p11*x*y +  '...
             'p02*y^2 + p30*x^3 + p21*x^2*y + p12*x*y^2 + p03*y^3.']);
 
-%=========================================== Give a description of the file        
+        Plens_ID = netcdf.defVar(ncid,'Plens','double',[dimidLens]);
+        netcdf.putAtt(ncid,Plens_ID,'long_name',['Lens position.']);
+        netcdf.putAtt(ncid,Plens_ID,'units','mm');
+        netcdf.putAtt(ncid,Plens_ID,'description',['Approximate ' ...
+            'position (x,y,z) of the camera or projector lens ' ...
+            'determined during calibration.']);
+
+        Zlevels_ID = netcdf.defVar(ncid,'zlevels','double',[dimidLevels]);
+        netcdf.putAtt(ncid,Zlevels_ID,'long_name',['Calibration plate ' ...
+            'heights.']);
+        netcdf.putAtt(ncid,Zlevels_ID,'units','mm');
+        netcdf.putAtt(ncid,Zlevels_ID,'description',['Heights at ' ...
+            'which the calibration plate or projected pattern was ' ...
+            'photographed during calibration.']);
+
+%=========================================== Give a description of the file
         % Global 
         varid = netcdf.getConstant('GLOBAL');
         netcdf.putAtt(ncid,varid,'Description',['Experimental data '...
@@ -157,7 +183,9 @@ for iz = 1:nz
         netcdf.putVar(ncid,Coeffdy_ID,CoeffCal_cdy);
         netcdf.putVar(ncid,Coeffx0_ID,CoeffCal_cx0);
         netcdf.putVar(ncid,Coeffy0_ID,CoeffCal_cy0);
-        
+        netcdf.putVar(ncid,Plens_ID,Plens_val);
+        netcdf.putVar(ncid,Zlevels_ID,Zlevels_val);
+
         %We're done, close the netcdf
         netcdf.close(ncid);
 % 
