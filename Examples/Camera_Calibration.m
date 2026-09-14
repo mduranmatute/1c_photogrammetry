@@ -23,16 +23,19 @@ PlotCheck = 0; % Use to plot some of the results. Used for diagnostics
 addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'Common_Functions'));
                                     % Folder containing the functions used
                                     % in the script.
-SavLoc = '..\Data_Files\MATLAB'; % Root location where data is saved. 
-               
-imagedir = 'Photographs\Camera\'; % Location of the photographs used for
-                                  % the calibration.
+SavLoc = fullfile('..', 'Data_Files', 'MATLAB'); % Root location where
+                                                 % data is saved.
+
+imagedir = fullfile('Photographs', 'Camera'); % Location of the
+                                              % photographs used for
+                                              % the calibration.
 zlevels = [14.35, 59.375, 74.475, 104.425, 134.475, 149.25, 194.25];                                   
 % These are the heights from the bottom (in mm) at which the calibration 
 % plate was photographed.
 
 %Name and location where the camera calibration file will be saved.
-Save_name = [SavLoc '\Calibration_data\Camera_LinesFit_Example.mat'];
+Save_name = fullfile(SavLoc, 'Calibration_data', ...
+                      'Camera_LinesFit_Example.mat');
 
 nz = numel(zlevels); % Number of levels at which the calibration plate was
                      % photographed.
@@ -44,8 +47,8 @@ Plens_pixels = [811.7, 628.9];
 Zlens = [2060, 2060]; % mm
 
 %% This part of the script is used to find dots in an image
-infofile = [SavLoc '\Data_process_steps\Calibration\' ...
-              'PlateDotsRaw_CamCal.mat']; % data file where the unprocessed
+infofile = fullfile(SavLoc, 'Data_process_steps', 'Calibration', ...
+              'PlateDotsRaw_CamCal.mat'); % data file where the unprocessed
                                           % dot location is stored.
 create_new = true;
 if exist(infofile, 'file') % Find if file already exists.
@@ -58,7 +61,7 @@ if exist(infofile, 'file') % Find if file already exists.
 end
 
 if create_new %If file does not exist find dots and create file.
-    files = dir([imagedir 'z*.png']); % make a list with the images.
+    files = dir(fullfile(imagedir, 'z*.png')); % make a list with the images.
     names = sort({files.name});
     for iz = 1:nz % cycle though each image in the list
         imgname = fullfile(imagedir, names{iz});
@@ -103,8 +106,8 @@ end
 % human input is required to relate the dots in the photographs to the ones
 % found by the [find_circles] function.
 
-infofile = [SavLoc '\Data_process_steps\Calibration\' ...
-            'Sorted_CamDots_CamCal.mat'];
+infofile = fullfile(SavLoc, 'Data_process_steps', 'Calibration', ...
+            'Sorted_CamDots_CamCal.mat');
 
 create_new = true; % As before, determine if file already exists and load
                    % if chosen.

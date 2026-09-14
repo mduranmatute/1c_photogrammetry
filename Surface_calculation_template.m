@@ -22,8 +22,16 @@ theta = 0.0; % A small roation of the pattern is implemented.
 Omega = 0.0; % Rotation rate (rad/s) of the set-up. Examples shown here did
              % not rotate except for a single case (measurement = 3).
 Normal = [0,0,1]; % Define the Normal vector (points upward)
-load('refraction', 'Nwater', 'Nair'); % Load air and water index of 
+load('refraction', 'Nwater', 'Nair'); % Load air and water index of
                                       % refraction values
+
+% Name and location of the camera and projector calibration files (.mat)
+% produced by Camera_Calibration_Template.m and
+% Projector_Calibration_Template.m.
+Cam_File  = '';
+Proj_File = '';
+cm = load(Cam_File,  'cx0', 'cy0', 'cdx', 'cdy');
+pr = load(Proj_File, 'cx0', 'cy0', 'cdx', 'cdy');
 
 % Directory where pattern photographs are located
 imagedir    = '';

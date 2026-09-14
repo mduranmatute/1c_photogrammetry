@@ -199,13 +199,23 @@ for iz = 1:nz
         cam.y = [cam.y; image_dots(iz,ii).y]; 
     end
     
-    % Here, the pixel coordinates of the dots in the photographs that were 
+    % Here, the pixel coordinates of the dots in the photographs that were
     % found to belong to the projected dots are converted to 3D-planes
     x = cam.x;
     y = cam.y;
     observed(iz).x = cm.cx0(x,y) + zlevels(iz) * cm.cdx(x,y);
     observed(iz).y = cm.cy0(x,y) + zlevels(iz) * cm.cdy(x,y);
-    observed(iz).z = zlevels(iz) * ones(size(x));   
+    observed(iz).z = zlevels(iz) * ones(size(x));
+
+    % Since the calibration plate did not cover the complete projection
+    % area, the dots that fall over the plate are removed. The position
+    % values at which the dots are eliminated are given by the plates
+    % dimensions.
+    k = find(observed(iz).x < 25 | observed(iz).x > 575 | ...
+             observed(iz).y < 25 | observed(iz).y > 575);
+    observed(iz).x(k) = nan;
+    observed(iz).y(k) = nan;
+    observed(iz).z(k) = nan;
 end
 
 %% Find formulas to convert projector pixel coordinates to lines in space:

@@ -24,9 +24,11 @@ PlotCheck = 0; % Use to plot some of the results. Used for diagnostics
 addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'Common_Functions'));
                                     % Folder containing the functions used
                                     % in the script.
-SavLoc = '..\Data_Files\MATLAB'; % Root location where data is saved. 
-ImageDir    = 'Photographs\Projector\'; % Location of the photographs used
-                                                    %  for the calibration.
+SavLoc = fullfile('..', 'Data_Files', 'MATLAB'); % Root location where
+                                                 % data is saved.
+ImageDir = fullfile('Photographs', 'Projector'); % Location of the
+                                                 % photographs used
+                                                 % for the calibration.
 % zlevels are the heights in mm (from the bottom) at which the patterns 
 % were photographed.                                                    
 zlevels = [2.150,15.450,60.475,75.575,105.525,135.575,150.350,195.350];
@@ -43,8 +45,10 @@ Pr_Rrange = [5,9];  % For the dot detection of the photographed patterns
 
 % Name and location where the Projector calibration file will be saved and
 % name of the camera calibration file (.mat) to load.
-Save_name = [SavLoc '\Calibration_data\Projector_LinesFit_Example.mat'];
-Cam_File = [SavLoc '\Calibration_data\Camera_LinesFit_Example.mat'];
+Save_name = fullfile(SavLoc, 'Calibration_data', ...
+                      'Projector_LinesFit_Example.mat');
+Cam_File = fullfile(SavLoc, 'Calibration_data', ...
+                     'Camera_LinesFit_Example.mat');
          
 % Load the polynomials from the camera calibration
 cm = load(Cam_File, 'cx0', 'cy0', 'cdx', 'cdy', 'Plens');
@@ -64,8 +68,8 @@ Plens = [4, 560, 1100]; % Unlike the camera calibration, the position of
 
 % Data file where the (pixel) position of the dot patterns sent to the
 % projector are saved.
-infofile = [SavLoc '\Data_process_steps\Calibration\'...
-                        'DotPosInPattern_ProjCal.mat']; 
+infofile = fullfile(SavLoc, 'Data_process_steps', 'Calibration', ...
+                        'DotPosInPattern_ProjCal.mat');
         
 create_new = true;
 if exist(infofile, 'file')% Find if file with dot positions already exists.
@@ -81,7 +85,7 @@ end
 %
 if create_new
     % Load the file with the dot pattern images.
-    Pattern_images_file = [SavLoc '\Patterns\' PatternName];
+    Pattern_images_file = fullfile(SavLoc, 'Patterns', PatternName);
     PatternPrj = load(Pattern_images_file);
     
     % Determine the amount of pattern images
@@ -112,8 +116,8 @@ end
 
 % Name the data file where the (pixel) position of the photographed dot 
 % patterns will be saved.
-infofile = [SavLoc '\Data_process_steps\Calibration\'...
-                    'DotPosInPhoto_ProjCal.mat']; 
+infofile = fullfile(SavLoc, 'Data_process_steps', 'Calibration', ...
+                    'DotPosInPhoto_ProjCal.mat');
 
 % Load values or create file with the position of the dots
 create_new = true;
@@ -129,8 +133,8 @@ if create_new
     for iz = 1:nz % Do for each level 
         % Add all the folders in the directory with z_1, z_2, ... z_n
         % in a list.
-        imgfold = sprintf('z_%d/', iz);
-        files = dir([ImageDir imgfold, '*.png']);
+        imgfold = sprintf('z_%d', iz);
+        files = dir(fullfile(ImageDir, imgfold, '*.png'));
         names = sort({files.name});
         fprintf('processing iz = %d\n', iz);
         for ii = 1:npos % for all photographed patterns
@@ -167,8 +171,8 @@ end
 % are eliminated.
 
 % Name the data file where the position of the sorted dots will be saved
-infofile = [SavLoc '\Data_process_steps\Calibration\' ...
-                    'SortedDotPos_ProjCal.mat']; 
+infofile = fullfile(SavLoc, 'Data_process_steps', 'Calibration', ...
+                    'SortedDotPos_ProjCal.mat');
 
 % Load or create new file.        
 create_new = true;
@@ -185,7 +189,7 @@ if create_new
     clear Ipat Icam
     if ~exist('DotsToProject', 'var')
         % if pattern file does not exist load.
-        PatternPrj = load([SavLoc '\Patterns\' PatternName]);
+        PatternPrj = load(fullfile(SavLoc, 'Patterns', PatternName));
     end
     % Compare each dot pattern projected with its photograph for all levels
     for iz = 1:nz
@@ -194,7 +198,7 @@ if create_new
             % Pattern sent to projector.
             Ipat{ii} = PatternPrj.DotsToProject(:,:,ii); 
             % Pattern captured by the camera.
-            Icam{ii} = imread([ImageDir image_names{iz,ii}]);
+            Icam{ii} = imread(fullfile(ImageDir, image_names{iz,ii}));
         end
         % The comparisson is done by the function
         % [sort_projected_dots]. It requires user input to
