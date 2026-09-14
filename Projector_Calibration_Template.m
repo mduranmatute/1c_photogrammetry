@@ -209,16 +209,25 @@ for ii = 1:npos
     pattern.y = [pattern.y; patdots(ii).y];
 end
 
+% Extent of the calibration plate, used below to discard projector dots
+% that fall outside the plate. See [Common_Functions/calibration_plate_
+% grid.m] for the plate geometry.
+plate = calibration_plate_grid();
+plate_xmin = plate.center_x - (plate.nx-1)/2*plate.dx;
+plate_xmax = plate.center_x + (plate.nx-1)/2*plate.dx;
+plate_ymin = plate.center_y - (plate.ny-1)/2*plate.dy;
+plate_ymax = plate.center_y + (plate.ny-1)/2*plate.dy;
+
 % Now a variable where the positions of the dots found in the photographs
 % will be combined is initialized.
 for iz = 1:nz
     cam.x = [];
     cam.y = [];
     for ii = 1:npos
-        cam.x = [cam.x; image_dots(iz,ii).x]; 
-        cam.y = [cam.y; image_dots(iz,ii).y]; 
+        cam.x = [cam.x; image_dots(iz,ii).x];
+        cam.y = [cam.y; image_dots(iz,ii).y];
     end
-    
+
     % Here, the pixel coordinates of the dots in the photographs that were
     % found to belong to the projected dots are converted to 3D-planes
     x = cam.x;
@@ -231,8 +240,8 @@ for iz = 1:nz
     % area, the dots that fall over the plate are removed. The position
     % values at which the dots are eliminated are given by the plates
     % dimensions.
-    k = find(observed(iz).x < 25 | observed(iz).x > 575 | ...
-             observed(iz).y < 25 | observed(iz).y > 575);
+    k = find(observed(iz).x < plate_xmin | observed(iz).x > plate_xmax | ...
+             observed(iz).y < plate_ymin | observed(iz).y > plate_ymax);
     observed(iz).x(k) = nan;
     observed(iz).y(k) = nan;
     observed(iz).z(k) = nan;

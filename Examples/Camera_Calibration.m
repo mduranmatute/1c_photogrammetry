@@ -87,12 +87,14 @@ end
 
 
 %% grid coordinates in world coordinates of the calibration plate
-nx = 23;    % number of dots in x and y
-ny = 23;
-dx = 25;    % mesh size in mm
-dy = 25;
-xrange = 300 + (-11:11)*dx;       % take the centre of the axes 0,0
-yrange = 300 + (-11:11)*dy;       % y-axis to down
+% See [Common_Functions/calibration_plate_grid.m] for the plate geometry.
+plate = calibration_plate_grid();
+nx = plate.nx;    % number of dots in x and y
+ny = plate.ny;
+dx = plate.dx;    % mesh size in mm
+dy = plate.dy;
+xrange = plate.center_x + (-(nx-1)/2:(nx-1)/2)*dx; % take the centre of the axes 0,0
+yrange = plate.center_y + (-(ny-1)/2:(ny-1)/2)*dy; % y-axis to down
 [X,Y] = meshgrid(xrange, yrange);
 
 clear grid
