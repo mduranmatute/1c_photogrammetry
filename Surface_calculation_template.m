@@ -396,8 +396,8 @@ v = output(k,3);
 
 xrange = linspace(min(output(:,1)),max(output(:,1)),Interp_Div);
 yrange = linspace(min(output(:,2)),max(output(:,2)),Interp_Div);
-[xqS,yqS] = meshgrid(xrange, yrange);
-vqS = griddata(x,y,v,xqS,yqS, 'cubic');
+[xq,yq] = meshgrid(xrange, yrange);
+vq = griddata(x,y,v,xq,yq, 'cubic');
 
 % save both the original measurements and the re-grided interpolation
-save(Reconstruct,'Pmid','xqS','yqS','vqS');
+save(Reconstruct,'Pmid','xq','yq','vq');
