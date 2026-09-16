@@ -23,10 +23,12 @@ For the full derivation and method, see the paper above.
 | `Surface_calculation_template.m` | Template script to measure a surface. Requires finished camera and projector calibrations. |
 | `Common_Functions/` | Shared functions used by the templates and examples (dot detection, calibration-plate geometry, polynomial fitting, refraction, line intersection, interactive point-matching). |
 | `Examples/` | Filled-in versions of the three templates above, showing complete worked calibrations and measurements (undulated plate, standing cylinders, sediment bed). These scripts expect a photographs/data directory tree that is **not** included in this repository (see below). |
-| `NetCDF_Convert/` | Scripts to convert the intermediate and final `.mat` files produced by the pipeline into NetCDF, for long-term archival. |
+| `NetCDF_Convert/` | Scripts to convert `.mat` files produced by the pipeline into NetCDF for long-term archival (`Calib_C.m`, `Patterns_C.m`, `Measurements_C.m`, `StepsM_C.m`), and the reverse - `Calib_NC2MAT.m`, `Patterns_NC2MAT.m`, `Measurements_NC2MAT.m` reconstruct working `.mat` calibration, pattern, and reconstruction files from an archived NetCDF dataset, for someone who only has the published NetCDF data and wants to run the pipeline against it. |
 | `LICENSE` | Apache License 2.0. |
 
 The `Examples/` scripts reference photographs and processed `.mat` files (calibration plate photos, projected pattern photos, dot positions, reconstructions) that belong to the experiments described in the paper. That data is not part of this repository; the scripts are included to show a complete, working pipeline and as a starting point for adapting to your own data.
+
+If you only have a published NetCDF archive (no `.mat` files), running the `*_NC2MAT.m` scripts in `NetCDF_Convert/` reconstructs working calibration, pattern, and reconstruction `.mat` files you can use directly as `Cam_File`/`Proj_File`/`Pattern_Fl` inputs elsewhere in the pipeline. One caveat: a calibration NetCDF file archived before `Plens` and `zlevels` were added to `Calib_C.m` won't have them, so `Calib_NC2MAT.m` reconstructs those two as empty for such a file (with a warning) - the calibration coefficients themselves are unaffected either way.
 
 ## Usage
 
