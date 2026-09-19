@@ -67,8 +67,14 @@ for iz = 1:nz
         
 %======================================================== Define dimensions
         dimidNCoef = netcdf.defDim(ncid,'Num_Coeff',N_dim);
-        dimidLens = netcdf.defDim(ncid,'Lens_dim',N_lens);
-        dimidLevels = netcdf.defDim(ncid,'Num_Levels',N_lev);
+        have_lens = N_lens > 0;
+        have_levels = N_lev > 0;
+        if have_lens
+            dimidLens = netcdf.defDim(ncid,'Lens_dim',N_lens);
+        end
+        if have_levels
+            dimidLevels = netcdf.defDim(ncid,'Num_Levels',N_lev);
+        end
 
 %=============================== Define IDs for the the dimension variables
         NPol_ID = netcdf.defVar(ncid,'Num_Coeff','NC_Byte',[dimidNCoef]);
@@ -127,20 +133,24 @@ for iz = 1:nz
             'val(x,y) = p00 + p10*x + p01*y + p20*x^2 + p11*x*y +  '...
             'p02*y^2 + p30*x^3 + p21*x^2*y + p12*x*y^2 + p03*y^3.']);
 
-        Plens_ID = netcdf.defVar(ncid,'Plens','double',[dimidLens]);
-        netcdf.putAtt(ncid,Plens_ID,'long_name',['Lens position.']);
-        netcdf.putAtt(ncid,Plens_ID,'units','mm');
-        netcdf.putAtt(ncid,Plens_ID,'description',['Approximate ' ...
-            'position (x,y,z) of the camera or projector lens ' ...
-            'determined during calibration.']);
+        if have_lens
+            Plens_ID = netcdf.defVar(ncid,'Plens','double',[dimidLens]);
+            netcdf.putAtt(ncid,Plens_ID,'long_name',['Lens position.']);
+            netcdf.putAtt(ncid,Plens_ID,'units','mm');
+            netcdf.putAtt(ncid,Plens_ID,'description',['Approximate ' ...
+                'position (x,y,z) of the camera or projector lens ' ...
+                'determined during calibration.']);
+        end
 
-        Zlevels_ID = netcdf.defVar(ncid,'zlevels','double',[dimidLevels]);
-        netcdf.putAtt(ncid,Zlevels_ID,'long_name',['Calibration plate ' ...
-            'heights.']);
-        netcdf.putAtt(ncid,Zlevels_ID,'units','mm');
-        netcdf.putAtt(ncid,Zlevels_ID,'description',['Heights at ' ...
-            'which the calibration plate or projected pattern was ' ...
-            'photographed during calibration.']);
+        if have_levels
+            Zlevels_ID = netcdf.defVar(ncid,'zlevels','double',[dimidLevels]);
+            netcdf.putAtt(ncid,Zlevels_ID,'long_name',['Calibration plate ' ...
+                'heights.']);
+            netcdf.putAtt(ncid,Zlevels_ID,'units','mm');
+            netcdf.putAtt(ncid,Zlevels_ID,'description',['Heights at ' ...
+                'which the calibration plate or projected pattern was ' ...
+                'photographed during calibration.']);
+        end
 
 %=========================================== Give a description of the file
         % Global 
@@ -183,8 +193,12 @@ for iz = 1:nz
         netcdf.putVar(ncid,Coeffdy_ID,CoeffCal_cdy);
         netcdf.putVar(ncid,Coeffx0_ID,CoeffCal_cx0);
         netcdf.putVar(ncid,Coeffy0_ID,CoeffCal_cy0);
-        netcdf.putVar(ncid,Plens_ID,Plens_val);
-        netcdf.putVar(ncid,Zlevels_ID,Zlevels_val);
+        if have_lens
+            netcdf.putVar(ncid,Plens_ID,Plens_val);
+        end
+        if have_levels
+            netcdf.putVar(ncid,Zlevels_ID,Zlevels_val);
+        end
 
         %We're done, close the netcdf
         netcdf.close(ncid);
