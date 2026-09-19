@@ -161,6 +161,8 @@ the corresponding line of sight in 3D space:
 | `cdy` | `Num_Coeff` | – | Coefficients of the line-direction vector, Y component |
 | `cx0` | `Num_Coeff` | mm | Coefficients of the line-origin vector, X component |
 | `cy0` | `Num_Coeff` | mm | Coefficients of the line-origin vector, Y component |
+| `Plens` | `Lens_dim` (=3) | mm | Approximate position (x, y, z) of the camera or projector lens determined during calibration |
+| `zlevels` | `Num_Levels` (case-dependent) | mm | Heights at which the calibration plate or projected pattern was photographed. Absent from `Camera_LinesFit_Base.nc`, whose source calibration predates this value being routinely recorded |
 
 ### 11.2 `Patterns/` — 3 files
 
@@ -286,3 +288,4 @@ photogrammetry: incorporation of refraction at a fluid interface.
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2020-11-10 | Initial data files generated (see per-file `Creation date` global attribute) |
+| 1.1 | 2026-09-17 | `Calibration_Data/*.nc` regenerated to also include `Plens` and `zlevels` (Section 11.1), previously omitted from the NetCDF conversion though always present in the corresponding `.mat` files |
